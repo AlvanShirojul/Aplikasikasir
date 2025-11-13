@@ -300,9 +300,9 @@ function buildCartFromHistory() {
   const grouped = new Map();
   actionHistory.forEach(item => {
     if (grouped.has(item.id)) {
-      grouped.get(item.name).quantity++;
+      grouped.get(item.id).quantity++;
     } else {
-      grouped.set(item.name, { ...item, quantity: 1 });
+      grouped.set(item.id, { ...item, quantity: 1 });
     }
   });
   return Array.from(grouped.values());
@@ -539,6 +539,7 @@ function closeAlertModal() {
 </script>
 </body>
 </html>
+
 
 
 
