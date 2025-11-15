@@ -330,12 +330,23 @@
                 <h1 class="text-3xl sm:text-4xl font-bold text-white">App Jam Dalu</h1>
                 <p class="text-gray-300 text-sm sm:text-base">Pilih produk untuk ditambahkan ke transaksi.</p>
             </div>
-            <!-- Tombol Riwayat -->
-            <button onclick="openHistoryModal()" class="btn-primary p-1 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 vw" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </button>
+            <!-- Tombol Riwayat & Riwayat Hutang -->
+            <div class="flex gap-2">
+                <!-- Tombol Riwayat Hutang -->
+                <button onclick="openHutangModal()" class="btn-danger p-1 flex items-center justify-center" title="Riwayat Hutang">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h5a2 2 0 012 2v14a2 2 0 01-2 2z" />
+                    </svg>
+                </button>
+
+                <!-- Tombol Riwayat Transaksi -->
+                <button onclick="openHistoryModal()" class="btn-primary p-1 flex items-center justify-center" title="Riwayat Transaksi">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 vw" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </button>
+            </div>
         </header>
 
         <!-- Container Produk -->
@@ -383,13 +394,14 @@
             
             <select id="cashier-name" class="filter-select">
                 <option value="" disabled selected>-- Pilih Kasir --</option>
-                <option value="Kasir 1 (Ajis)">Kasir 1 (Ajis)</option>
-                <option value="Kasir 2 (Bobo)">Kasir 2 (Bobo)</option>
+                <option value="Kasir 1 (Ajis)">Ajis</option>
+                <option value="Kasir 2 (Bobo)">Bobo</option>
                 <option value="Owner (Alvan)">Owner (Alvan)</option>
             </select>
             
             <div class="modal-footer">
-                <button onclick="closeCashierModal()" class="btn-secondary">Batal</button>
+                <button onclick="closeCashierModal()" class="btn-secondary">batal</button>
+                <button onclick="submithutang()" id="confirm-hutang-button" class="btn-danger">Hutang</button>
                 <button onclick="submitToGAS()" id="confirm-save-button" class="btn-primary">Simpan Transaksi</button>
             </div>
         </div>
@@ -457,6 +469,25 @@
             </div>
         </div>
     </div>
+    <!-- Modal Riwayat Hutang -->
+    <div id="hutang-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
+        <div class="history-modal-content">
+            <div class="flex justify-between items-center history-header">
+                <h2 class="font-bold text-xl">Riwayat Hutang Pelanggan</h2>
+            </div>
+
+            <div id="hutang-content" class="overflow-y-auto flex-grow space-y-3 pr-2">
+                <p class="text-center text-gray-300 py-10">Memuat data...</p>
+            </div>
+
+            <div class="p-4 flex justify-between items-center border-t mt-4">
+                <button onclick="closeHutangModal()" class="btn-secondary">Tutup</button>
+                <p class="text-right text-white text-sm">
+                    Total Hutang: <span id="hutang-total" class="font-bold text-red-400">Rp 0</span>
+                </p>
+            </div>
+        </div>
+    </div>
     <!-- MODAL FILTER -->
     <div id="filter-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center p-4">
         <div class="modal-content max-w-md w-full">
@@ -483,7 +514,7 @@
 /* ------------------------------------------------------------
    KONFIGURASI URL API
 ------------------------------------------------------------ */
-const GIST_URL_GET_PRODUCTS = "https://gist.githubusercontent.com/AlvanShirojul/b9f400f45a704f46621270287c26ac51/raw/a3bb54daa022cdf320f4465cbcb179e1876f41ce/Angkringan.json";
+const GIST_URL_GET_PRODUCTS = "https://gist.githubusercontent.com/AlvanShirojul/b9f400f45a704f46621270287c26ac51/raw/6bf309946bb55f4cb8f26b8800d4acc39746889a/Angkringan.json";
 const TargetUrl = "https://script.google.com/macros/s/AKfycbxldYba5CuCKZQULho9IXGV7kaKvFOBrwdAF8_JAxkbThbUTx2kmCB-31is3fyXbapUQA/exec";
 const ProxyUrl = "https://spring-frog-1892.alpansirojul.workers.dev/?url=";
 
@@ -584,8 +615,8 @@ function clearCart() {
 
   showAlert(
     'error',
-    'Hapus Semua Produk?',
-    'Apakah Anda yakin ingin mengosongkan keranjang?',
+    'tenan to gak?',
+    'di input sek, seeng bener !!!',
     `
       <button onclick="confirmClearCart()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition">Ya, Hapus</button>
       <button onclick="closeAlertModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded-lg transition">Batal</button>
@@ -737,7 +768,90 @@ async function submitToGAS() {
     confirmBtn.textContent = "Simpan Transaksi";
   }
 }
+/* ------------------------------------------------------------
+   FUNGSI SIMPAN HUTANG KE SHEET "Hutang_Pelanggan"
+------------------------------------------------------------ */
+async function submithutang() {
+  const confirmBtn = el('confirm-hutang-button');
+  const cashier = el('cashier-name').value.trim();
 
+  if (!cashier) {
+    showAlert('error', 'Kasir belum dipilih', 'Pilih nama kasir sebelum mencatat hutang.');
+    return;
+  }
+
+  if (cart.length === 0) {
+    showAlert('error', 'Keranjang Kosong', 'Tambahkan produk sebelum menyimpan hutang.');
+    return;
+  }
+
+  // Minta nama pelanggan
+  const debtor = prompt("Masukkan nama pelanggan yang berhutang:");
+  if (!debtor) {
+    showAlert('error', 'Nama belum diisi', 'Masukkan nama pelanggan terlebih dahulu.');
+    return;
+  }
+
+  // Buat ID dan tanggal transaksi
+  const transactionId = `HUT-${Date.now().toString().slice(-8)}`;
+  const transactionDate = new Date().toLocaleString('id-ID');
+
+  // Bentuk struktur data seperti transaksi biasa + nama pelanggan & status
+  const hutangRows = cart.map(item => ({
+    tanggal: transactionDate,
+    id_transaksi: transactionId,
+    id_produk: item.id,
+    nama_produk: item.name,
+    qty: item.quantity,
+    harga: item.price,
+    subtotal: item.price * item.quantity,
+    nama_pelanggan: debtor,
+    kasir: cashier,
+    status: "Belum Lunas"
+  }));
+
+  try {
+    isSaving = true;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Menyimpan...";
+
+    // ✅ Gunakan proxy yang sama seperti GET transaksi
+    const res = await fetch(ProxyUrl + encodeURIComponent(TargetUrl), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: "saveHutang", // flag agar diarahkan ke sheet Hutang_Pelanggan
+        data: hutangRows
+      })
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`HTTP ${res.status} - ${errorText}`);
+    }
+
+    const response = await res.json();
+    if (response.status !== 'success') {
+      throw new Error(response.message || 'Gagal menyimpan hutang.');
+    }
+
+    showAlert(
+      'success',
+      'Hutang Tersimpan',
+      `Hutang atas nama <b>${debtor}</b> sebesar <b>Rp ${hutangRows.reduce((s, i) => s + i.subtotal, 0).toLocaleString('id-ID')}</b> telah disimpan di daftar hutang.`,
+      `<button onclick="closeAlertModal(); closeCashierModal(); actionHistory = []; updateCart();" 
+        class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-lg">OK</button>`
+    );
+
+  } catch (err) {
+    console.error("Error simpan hutang:", err);
+    showAlert('error', 'Gagal Menyimpan Hutang', `Terjadi kesalahan: ${escapeHtml(err.message)}`);
+  } finally {
+    isSaving = false;
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = "Hutang";
+  }
+}
 /* ------------------------------------------------------------
    FUNGSI RIWAYAT TRANSAKSI (dari GAS)
    Note: Apps Script returns { status, history }
@@ -750,6 +864,163 @@ async function openHistoryModal() {
 }
 function openFilterModal() {
     el("filter-modal").classList.remove("hidden");
+}
+/* ------------------------------------------------------------
+   FUNGSI RIWAYAT HUTANG (Menampilkan per transaksi)
+------------------------------------------------------------ */
+async function openHutangModal() {
+  const modal = el('hutang-modal');
+  const content = el('hutang-content');
+  const totalDisplay = el('hutang-total');
+
+  modal.classList.remove('hidden');
+  content.innerHTML = '<p class="text-center text-gray-300 py-10">Memuat data hutang...</p>';
+
+  try {
+    // Ambil data hutang dari GAS (via proxy)
+    const res = await fetch(`${ProxyUrl}${TargetUrl}?action=hutang&_=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    let history = data.history || [];
+        history = history.filter(row => {
+    const status = String(row["Status"] || "").trim().toLowerCase();
+    return status !== "lunas"; // tampilkan hanya yang belum lunas
+    });
+    if (!history.length) {
+      content.innerHTML = '<p class="text-center text-gray-400 py-10">Belum ada data hutang pelanggan.</p>';
+      totalDisplay.textContent = "Rp 0";
+      return;
+    }
+
+    // 🔹 1. Kelompokkan berdasarkan ID Transaksi
+    const grouped = new Map();
+    history.forEach(row => {
+      const id = String(row["ID Transaksi"] || "").trim();
+      if (!id) return;
+
+      if (!grouped.has(id)) {
+        grouped.set(id, {
+          id,
+          tanggal: row["Tanggal"] || "",
+          pelanggan: row["Pelanggan"] || row["Nama Pelanggan"] || "-",
+          kasir: row["Cashier"] || row["Kasir"] || "-",
+          status: row["Status"] || "Belum Lunas",
+          total: 0,
+          items: []
+        });
+      }
+
+      const trx = grouped.get(id);
+      const qty = Number(row["Qty"] || 0);
+      const harga = Number(row["Harga"] || 0);
+      const subtotal = Number(row["Subtotal"] || 0);
+
+      trx.total += subtotal;
+      trx.items.push({
+        idProduk: row["ID Produk"] || "",
+        namaProduk: row["Nama Produk"] || "",
+        qty,
+        harga,
+        subtotal
+      });
+    });
+
+    // 🔹 2. Ubah Map → Array
+    const transactions = Array.from(grouped.values());
+
+    // 🔹 3. Hitung total seluruh hutang
+    const totalSemua = transactions.reduce((sum, t) => sum + t.total, 0);
+    totalDisplay.textContent = "Rp " + totalSemua.toLocaleString("id-ID");
+
+    // 🔹 4. Render hasil ke HTML
+    content.innerHTML = "";
+    transactions.forEach(trx => {
+      const itemsList = trx.items.map(i => `
+        <li class="flex justify-between text-sm text-gray-300 border-b border-gray-700 py-1">
+          <span>${escapeHtml(i.namaProduk)} <span class="text-gray-500">x${i.qty}</span></span>
+          <span>Rp ${i.subtotal.toLocaleString("id-ID")}</span>
+        </li>
+      `).join("");
+
+      const card = document.createElement("div");
+      card.className = "bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-md hover:shadow-lg transition-all mb-4";
+      card.innerHTML = `
+        <div class="flex justify-between items-center border-b border-gray-600 pb-2 mb-2">
+          <span class="font-bold text-lg text-white">#${escapeHtml(trx.id)}</span>
+          <span class="text-xs text-gray-400">${escapeHtml(trx.tanggal)}</span>
+            </div>
+            <div class="text-sm text-gray-200 mb-1">
+          <span class="font-semibold">Pelanggan:</span> ${escapeHtml(trx.pelanggan)}
+        </div>
+        <div class="flex justify-between items-center mb-1">
+          <div class="text-sm text-gray-200">
+            <span class="font-semibold">Kasir:</span> ${escapeHtml(trx.kasir)}
+          </div>
+          <button onclick="markAsLunas('${trx.id}')" 
+            class="text-xs px-3 py-1 rounded-lg bg-green-600/70 hover:bg-green-500/80 border border-white/20 text-white backdrop-blur-sm transition-all">
+            Tandai Lunas
+          </button>
+        </div>
+
+        <ul class="mt-2 border-t border-gray-700 pt-2">${itemsList}</ul>
+        <div class="flex justify-between items-center mt-3 border-t border-gray-700 pt-2">
+          <span class="font-semibold text-blue-300">Total Hutang:</span>
+          <span class="font-bold text-lg text-blue-400">Rp ${trx.total.toLocaleString("id-ID")}</span>
+        </div>
+        <div class="mt-2 text-right">
+          <span class="text-xs px-2 py-1 rounded-md ${
+            trx.status === "Lunas" ? "bg-green-600" : "none"
+          } text-white">${trx.status}</span>
+        </div>
+      `;
+      content.appendChild(card);
+    });
+  } catch (err) {
+    console.error("fetch hutang error:", err);
+    content.innerHTML = `<p class="text-center text-red-400 py-10">Gagal memuat data hutang: ${escapeHtml(err.message)}</p>`;
+  }
+}
+/* ------------------------------------------------------------
+   FUNGSI: Tandai Hutang Sebagai Lunas
+------------------------------------------------------------ */
+async function markAsLunas(trxId) {
+  if (!confirm(`Apakah kamu yakin ingin menandai transaksi ${trxId} sebagai Lunas?`)) return;
+
+  try {
+    // Tombol loading (opsional)
+    const button = event.target;
+    button.disabled = true;
+    button.textContent = "Memproses...";
+
+    // Kirim ke Apps Script lewat proxy
+    const res = await fetch(ProxyUrl + encodeURIComponent(TargetUrl), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: "updateHutang",
+        id_transaksi: trxId
+      })
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.status !== "success") throw new Error(data.message);
+
+    // ✅ Berhasil
+    alert(`Transaksi ${trxId} telah diperbarui menjadi Lunas.`);
+    openHutangModal(); // Refresh ulang tampilan daftar hutang
+  } catch (err) {
+    console.error("markAsLunas error:", err);
+    alert("Gagal memperbarui status: " + err.message);
+  }
+}
+function closeHutangModal() {
+  const modal = el('hutang-modal');
+  modal.classList.add('modal-leave');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    modal.classList.remove('modal-leave');
+  }, 300);
 }
 
 function closeFilterModal() {
@@ -793,7 +1064,7 @@ function applyHistoryFilter() {
       ? el('filter-cashier-modal').value 
       : 'all';
   const now = new Date();
-  const twentyHoursAgo = new Date(now.getTime() - (20 * 60 * 60 * 1000));
+  const twentyHoursAgo = new Date(now.getTime() - (15 * 60 * 60 * 1000));
 
   // allHistoryData is array of line-items. Group by ID Transaksi to produce transactions.
   const txMap = new Map();
@@ -936,4 +1207,3 @@ function escapeHtml(str) {
 </script>
 </body>
 </html>
-
